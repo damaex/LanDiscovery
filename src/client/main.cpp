@@ -1,25 +1,18 @@
-#include <winsock2.h>
+#include <LanDiscovery.h>
 #include <string>
 #include <iostream>
 #include <chrono>
 #include <thread>
 
-void log(const std::string& message) {
-	std::cout << message << std::endl;
-}
-
 void DieWithError(const std::string& errorMessage) {
-	log(errorMessage);
+	Console::writeLine(errorMessage);
 	exit(1);
 }
 
 int main(int argc, char *argv[])
 {
-	WSADATA wsaData;
-	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-	if (iResult != 0) {
-		DieWithError("WSAStartup failed with error: " + std::to_string(iResult));
+	if (!LanDiscovery::setupSocket()) {
+		DieWithError("WSAStartup failed with error");
 	}
 
 	SOCKET sock;                         /* Socket */

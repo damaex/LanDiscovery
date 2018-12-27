@@ -1,29 +1,18 @@
-#include <winsock2.h>
+#include <LanDiscovery.h>
 #include <string>
 #include <iostream>
 
 #define MAXRECVSTRING 255  /* Longest string to receive */
 
-void log(const std::string& message) {
-	std::cout << message << std::endl;
-}
-
 void DieWithError(const std::string& errorMessage) {
-	log(errorMessage);
+	Console::writeLine(errorMessage);
 	exit(1);
-}
-
-void socketClose(SOCKET socket) {
-	closesocket(socket);
 }
 
 int main(int argc, char *argv[])
 {
-	WSADATA wsaData;
-	int iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-
-	if (iResult != 0) {
-		DieWithError("WSAStartup failed with error: " +  std::to_string(iResult));
+	if (!LanDiscovery::setupSocket()) {
+		DieWithError("WSAStartup failed with error");
 	}
 
 	SOCKET sock;                         /* Socket */
@@ -34,7 +23,7 @@ int main(int argc, char *argv[])
 
 	if (argc != 2)    /* Test for correct number of arguments */
 	{
-		log("Usage: server <Broadcast Port>");
+		Console::writeLine("Usage: server <Broadcast Port>");
 		exit(1);
 	}
 
@@ -61,9 +50,9 @@ int main(int argc, char *argv[])
 			DieWithError("recvfrom() failed");
 
 		recvString[recvStringLen] = '\0';
-		log("Received: " + std::string(recvString));    /* Print the received string */
+		Console::writeLine("Received: " + std::string(recvString));    /* Print the received string */
 	}
 
-	socketClose(sock);
+	LanDiscovery::socketClose(sock);
 	return 0;
 }
